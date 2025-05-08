@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - Smart Parking</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body { font-family: 'Poppins', sans-serif; background-color: #f7fafc; overflow-x: hidden; }
+    .admin-section { background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'); background-size: cover; background-position: center; background-attachment: fixed; min-height: 100vh; padding-top: 80px; }
+    .summary-card { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 10px 20px rgba(0,0,0,0.1); transition: transform 0.3s ease, box-shadow 0.3s ease; }
+    .summary-card:hover { transform: translateY(-5px); box-shadow: 0 15px 25px rgba(0,0,0,0.2); }
+    .table-container { background: rgba(255,255,255,0.1); border-radius: 12px; padding: 1.5rem; backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.2); }
+    .action-btn { background: linear-gradient(90deg, #007BFF, #38A169); transition: transform 0.3s ease; }
+    .action-btn:hover { transform: scale(1.05); }
+    .nav-btn { background: #007BFF; color: white; padding: 0.75rem 1.5rem; border-radius: 8px; transition: transform 0.3s ease, background-color 0.3s ease; }
+    .nav-btn:hover { background-color: #0056b3; transform: scale(1.05); }
+    .no-data { background: #ffffff; border-radius: 12px; padding: 1.5rem; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+    @media (max-width: 768px) { .table-container { padding: 1rem; } .action-btn { padding: 0.5rem 1rem; font-size: 0.875rem; } .nav-btn { padding: 0.5rem 1rem; font-size: 0.875rem; } }
+  </style>
+</head>
+<body>
+  <nav class="fixed top-0 left-0 w-full bg-gray-900 bg-opacity-90 shadow-lg z-50">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+      <div class="text-2xl font-bold text-white"><i class="fas fa-parking mr-2"></i>Smart Parking</div>
+      <div class="flex space-x-4">
+        <span class="text-white">👋 {{ session['username'] }}</span>
+        <a href="{{ url_for('logout') }}" class="text-white hover:text-blue-400 transition">Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="admin-section">
+    <div class="container mx-auto px-4 py-8">
+      <h1 class="text-4xl font-bold text-white text-center mb-8 flex items-center justify-center gap-2"><i class="fas fa-tools"></i>Admin Panel</h1>
+
+      <div class="table-container">
+        <h2 class="text-2xl font-bold text-white mb-4 text-center">Active Bookings</h2>
+        {% if bookings %}
+          <div class="overflow-x-auto">
+            <table class="w-full text-white">
+              <thead>
+                <tr>
+                  <th class="px-4 py-2 bg-blue-600">ID</th>
+                  <th class="px-4 py-2 bg-blue-600">Username</th>
+                  <th class="px-4 py-2 bg-blue-600">Slot</th>
+                  <th class="px-4 py-2 bg-blue-600">Booking Time</th>
+                  <th class="px-4 py-2 bg-blue-600">Duration</th>
+                  <th class="px-4 py-2 bg-blue-600">Remaining Time</th>
+                  <th class="px-4 py-2 bg-blue-600">Total Price</th>
+                  <th class="px-4 py-2 bg-blue-600">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for booking in bookings %}
+                  <tr class="hover:bg-gray-800 transition">
+                    <td class="px-4 py-2">{{ booking.id }}</td>
+                    <td class="px-4 py-2">{{ booking.username }}</td>
+                    <td class="px-4 py-2">{{ booking.slot_id }}</td>
+                    <td class="px-4 py-2">{{ booking.booking_time }}</td>
+                    <td class="px-4 py-2">{{ (booking.duration // 60) }}h {{ (booking.duration % 60) }}m</td>
+                    <td class="px-4 py-2">{{ (booking.remaining_duration // 60) }}h {{ (booking.remaining_duration % 60) }}m</td>
+                    <td class="px-4 py-2">Rp{{ booking.total_price | format_number }}</td>
+                    <td class="px-4 py-2">
+                      <form method="POST" action="{{ url_for('unbook_slot', slot_id=booking.slot_id) }}" style="display: inline;">
+                        <button type="submit" class="action-btn">Unbook</button>
+                      </form>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="no-data text-center text-gray-700">No active bookings at the moment.</div>
+        {% endif %}
+      </div>
+
+      <div class="flex justify-center gap-4 mt-8 flex-wrap">
+        <a href="{{ url_for('admin_history') }}" class="nav-btn flex items-center gap-2"><i class="fas fa-history"></i>Booking History</a>
+        <a href="{{ url_for('admin_users') }}" class="nav-btn flex items-center gap-2"><i class="fas fa-users"></i>User Management</a>
+        <a href="{{ url_for('dashboard') }}" class="nav-btn flex items-center gap-2"><i class="fas fa-home"></i>Back to Dashboard</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="bg-gray-900 text-white py-6 mt-auto">
+    <div class="container mx-auto px-4 text-center">
+      <p>© 2025 Smart Parking. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
+  <script>
+    gsap.from('.table-container', { opacity: 0, y: 50, duration: 1, delay: 0.5, ease: "power2.out" });
+    gsap.from('.nav-btn', { opacity: 0, y: 20, duration: 0.8, stagger: 0.2, delay: 1, ease: "power2.out" });
+  </script>
