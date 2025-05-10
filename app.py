@@ -13,7 +13,7 @@ app = Flask(__name__)
 app.secret_key = os.urandom(24).hex()
 
 # Konfigurasi ThingsBoard
-THINGSBOARD_URL = "http://192.168.1.8:8080"
+THINGSBOARD_URL = "http://181.17.0.133:8080"
 DEVICE_TOKEN = "bb05f420-1ffa-11f0-a0bc-33b4e39bb6f7"
 USERNAME = "tenant@qtech.com"
 PASSWORD = "tenant1140"
@@ -48,7 +48,6 @@ with app.app_context():
             FOREIGN KEY (user_id) REFERENCES users (id)
         )
     ''')
-    # Tambah tabel untuk menyimpan data kendaraan yang ditandai
     conn.execute('''
         CREATE TABLE IF NOT EXISTS marked_vehicles (
             user_id INTEGER,
@@ -59,6 +58,52 @@ with app.app_context():
     ''')
     conn.commit()
     conn.close()
+
+# Dictionary untuk terjemahan bahasa
+translations = {
+    'en': {
+        'title': 'Smart Parking - Book Your Slot',
+        'nav_home': 'Home',
+        'nav_features': 'Features',
+        'nav_login': 'Login',
+        'nav_register': 'Register',
+        'hero_title': 'Smart Parking, Made Simple',
+        'hero_subtitle': 'Book your parking slot in real-time with cutting-edge IoT technology.',
+        'cta_button': 'Book Your Slot Now',
+        'features_title': 'Why Choose Smart Parking?',
+        'feature1_title': 'Real-Time Availability',
+        'feature1_desc': 'Check parking slot status instantly with our IoT-powered sensors.',
+        'feature2_title': 'Easy Booking',
+        'feature2_desc': 'Reserve your slot in seconds from your phone or laptop.',
+        'feature3_title': 'Secure & Reliable',
+        'feature3_desc': 'Your parking is safe with our advanced monitoring system.',
+        'footer': '© 2025 Smart Parking. All rights reserved.',
+    },
+    'id': {
+        'title': 'Parkir Cerdas - Pesan Slot Anda',
+        'nav_home': 'Beranda',
+        'nav_features': 'Fitur',
+        'nav_login': 'Masuk',
+        'nav_register': 'Daftar',
+        'hero_title': 'Parkir Cerdas, Dibuat Sederhana',
+        'hero_subtitle': 'Pesan slot parkir Anda secara real-time dengan teknologi IoT mutakhir.',
+        'cta_button': 'Pesan Slot Anda Sekarang',
+        'features_title': 'Mengapa Memilih Parkir Cerdas?',
+        'feature1_title': 'Ketersediaan Real-Time',
+        'feature1_desc': 'Periksa status slot parkir secara instan dengan sensor bertenaga IoT kami.',
+        'feature2_title': 'Pemesanan Mudah',
+        'feature2_desc': 'Pesan slot Anda dalam hitungan detik dari ponsel atau laptop Anda.',
+        'feature3_title': 'Aman & Terpercaya',
+        'feature3_desc': 'Parkir Anda aman dengan sistem pemantauan canggih kami.',
+        'footer': '© 2025 Parkir Cerdas. Semua hak dilindungi.',
+    }
+}
+
+# Route untuk mengatur bahasa
+@app.route('/set_language/<lang>')
+def set_language(lang):
+    session['language'] = lang
+    return redirect(request.referrer or url_for('index'))
 
 # Jinja Filter: format angka
 @app.template_filter('format_number')
@@ -137,11 +182,13 @@ def get_valid_token():
 def index():
     if session.get('user_id'):
         return redirect(url_for('dashboard'))
-    return render_template('index.html')
+    lang = session.get('language', 'en')
+    return render_template('index.html', translations=translations[lang], lang=lang)
 
 # REGISTER
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    lang = session.get('language', 'en')
     if request.method == 'POST':
         username = request.form['username']
         password = generate_password_hash(request.form['password'])
@@ -161,11 +208,12 @@ def register():
             flash('An error occurred during registration.', 'danger')
         finally:
             conn.close()
-    return render_template('register.html')
+    return render_template('register.html', translations=translations[lang])
 
 # LOGIN
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    lang = session.get('language', 'en')
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -188,7 +236,7 @@ def login():
             flash('An error occurred during login.', 'danger')
         finally:
             conn.close()
-    return render_template('login.html')
+    return render_template('login.html', translations=translations[lang], username="")
 
 # LOGOUT
 @app.route('/logout')
@@ -200,8 +248,9 @@ def logout():
 # DASHBOARD
 @app.route('/dashboard')
 def dashboard():
+    lang = session.get('language', 'en')
     user_id = session.get('user_id')
-    return render_template('dashboard.html', user_id=user_id)
+    return render_template('dashboard.html', user_id=user_id, translations=translations[lang], lang=lang)
 
 # BOOK SLOT
 @app.route('/book/<slot_id>', methods=['POST'])
@@ -323,18 +372,16 @@ def mark_vehicle(slot_id):
         flash('Please login to mark a vehicle.', 'danger')
         return redirect(url_for('login'))
 
-    action = request.form.get('action')  # 'mark' or 'unmark'
+    action = request.form.get('action')
     conn = get_db_connection()
     try:
         if action == 'mark':
-            # Tandai slot sebagai kendaraan user
             conn.execute(
                 'INSERT OR REPLACE INTO marked_vehicles (user_id, slot_id) VALUES (?, ?)',
                 (session['user_id'], slot_id)
             )
             flash(f'Slot {slot_id} marked as your vehicle.', 'success')
         elif action == 'unmark':
-            # Hapus tanda kendaraan
             conn.execute(
                 'DELETE FROM marked_vehicles WHERE user_id = ? AND slot_id = ?',
                 (session['user_id'], slot_id)
@@ -353,7 +400,6 @@ def mark_vehicle(slot_id):
 def get_status():
     try:
         token = get_valid_token()
-        # Ambil data dari ThingsBoard
         resp = requests.get(
             f"{THINGSBOARD_URL}/api/plugins/telemetry/DEVICE/{DEVICE_TOKEN}/values/timeseries",
             headers={"X-Authorization": f"Bearer {token}"},
@@ -384,7 +430,6 @@ def get_status():
             elif attr["key"] == "slot4_booked":
                 booked["slot4_booked"] = attr["value"]
 
-        # Pastikan status booked di ThingsBoard sesuai dengan semua booking di database
         conn = get_db_connection()
         bookings = conn.execute('SELECT slot_id FROM bookings').fetchall()
         slot_ids = [booking['slot_id'] for booking in bookings]
@@ -401,14 +446,25 @@ def get_status():
                     timeout=5
                 )
 
-        # Ambil data kendaraan yang ditandai oleh user saat ini
+        # Cek status occupied untuk setiap slot dan hapus marked_vehicles jika slot kosong
+        slot_map = {
+            'A1': data.get('slot1_occupied', [{'value': False}])[0]['value'],
+            'A2': data.get('slot2_occupied', [{'value': False}])[0]['value'],
+            'A3': data.get('slot3_occupied', [{'value': False}])[0]['value'],
+            'A4': data.get('slot4_occupied', [{'value': False}])[0]['value']
+        }
+        for slot_id, occupied in slot_map.items():
+            is_occupied = occupied == True or occupied == "true" or occupied == 1 or occupied == "1"
+            if not is_occupied:  # Jika slot kosong, hapus semua entri marked_vehicles untuk slot ini
+                conn.execute('DELETE FROM marked_vehicles WHERE slot_id = ?', (slot_id,))
+                logger.info(f"Cleared marked_vehicles for slot {slot_id} as it is now empty")
+
         marked_vehicles = conn.execute(
             'SELECT slot_id FROM marked_vehicles WHERE user_id = ?',
             (session.get('user_id'),)
         ).fetchall()
         marked_slots = [mv['slot_id'] for mv in marked_vehicles]
 
-        # Auto-unbook berdasarkan waktu
         now = datetime.now()
         rows = conn.execute(
             'SELECT id, slot_id, user_id, booking_time, duration, remaining_duration, total_price FROM bookings'
@@ -430,7 +486,6 @@ def get_status():
                 )
                 conn.execute('DELETE FROM bookings WHERE id = ?', (r['id'],))
                 expired_bookings.append({'slot_id': r['slot_id'], 'user_id': r['user_id']})
-                # Update ThingsBoard untuk slot yang expired
                 slot_number = '1' if r['slot_id'] == 'A1' else '2' if r['slot_id'] == 'A2' else '3' if r['slot_id'] == 'A3' else '4' if r['slot_id'] == 'A4' else '0'
                 booked_key = f"slot{slot_number}_booked"
                 lamp_key = f"lamp{slot_number}"
@@ -443,7 +498,6 @@ def get_status():
                 )
         conn.commit()
 
-        # Ambil data booking untuk ditampilkan di dashboard
         rows2 = conn.execute('''
             SELECT b.slot_id, b.user_id, b.booking_time, b.duration, b.remaining_duration, b.total_price, u.username
             FROM bookings b JOIN users u ON b.user_id = u.id
@@ -484,7 +538,7 @@ def get_status():
             'current_user': session.get('user_id'),
             'session_username': session.get('username'),
             'session_role': session.get('role'),
-            'marked_slots': marked_slots  # Kirim daftar slot yang ditandai oleh user
+            'marked_slots': marked_slots
         })
 
     except Exception as e:
@@ -494,6 +548,7 @@ def get_status():
 # USER HISTORY
 @app.route('/history')
 def user_history():
+    lang = session.get('language', 'en')
     if 'user_id' not in session:
         flash('Please login to view your history.', 'danger')
         return redirect(url_for('login'))
@@ -510,11 +565,12 @@ def user_history():
         history = []
     finally:
         conn.close()
-    return render_template('user_history.html', history=history)
+    return render_template('user_history.html', history=history, translations=translations[lang])
 
 # ADMIN HISTORY
 @app.route('/admin/history')
 def admin_history():
+    lang = session.get('language', 'en')
     if session.get('role') != 'admin':
         flash('Access denied. Admins only.', 'danger')
         return redirect(url_for('dashboard'))
@@ -532,11 +588,12 @@ def admin_history():
         history = []
     finally:
         conn.close()
-    return render_template('admin_history.html', history=history)
+    return render_template('admin_history.html', history=history, translations=translations[lang])
 
 # ADMIN PANEL
 @app.route('/admin')
 def admin_panel():
+    lang = session.get('language', 'en')
     if session.get('role') != 'admin':
         flash('Access denied. Admins only.', 'danger')
         return redirect(url_for('dashboard'))
@@ -553,11 +610,12 @@ def admin_panel():
         bookings = []
     finally:
         conn.close()
-    return render_template('admin_panel.html', bookings=bookings)
+    return render_template('admin_panel.html', bookings=bookings, translations=translations[lang])
 
 # ADMIN USERS
 @app.route('/admin/users', methods=['GET', 'POST'])
 def admin_users():
+    lang = session.get('language', 'en')
     if session.get('role') != 'admin':
         flash('Access denied. Admins only.', 'danger')
         return redirect(url_for('dashboard'))
@@ -583,7 +641,7 @@ def admin_users():
         users = []
     finally:
         conn.close()
-    return render_template('admin_users.html', users=users)
+    return render_template('admin_users.html', users=users, translations=translations[lang])
 
 # DELETE USER
 @app.route('/admin/delete_user/<int:user_id>', methods=['POST'])
@@ -622,7 +680,6 @@ def confirm_slot(slot, confirm):
                 booked_key: False,
                 lamp_key: True
             }
-            # Auto-unbook slot dari database
             slot_id = 'A1' if slot == 1 else 'A2' if slot == 2 else 'A3' if slot == 3 else 'A4'
             conn = get_db_connection()
             booking = conn.execute(
