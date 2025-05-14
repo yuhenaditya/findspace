@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Booking History - Smart Parking</title>
+  <title>Booking History - Find Space</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -20,7 +20,7 @@
 <body>
   <nav class="fixed top-0 left-0 w-full bg-gray-900 bg-opacity-90 shadow-lg z-50">
     <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-      <div class="text-2xl font-bold text-white"><i class="fas fa-parking mr-2"></i>Smart Parking</div>
+      <div class="text-2xl font-bold text-white"><i class="fas fa-map-marker-alt mr-2"></i>Find Space</div>
       <div class="flex space-x-4">
         <span class="text-white">👋 {{ session['username'] }}</span>
         <a href="{{ url_for('logout') }}" class="text-white hover:text-blue-400 transition">Logout</a>
@@ -71,7 +71,7 @@
 
   <footer class="bg-gray-900 text-white py-6 mt-auto">
     <div class="container mx-auto px-4 text-center">
-      <p>© 2025 Smart Parking. All rights reserved.</p>
+      <p>© 2025 Find Space. All rights reserved.</p>
     </div>
   </footer>
 
