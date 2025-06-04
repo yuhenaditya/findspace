@@ -86,6 +86,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
 ```
 
 **Penyesuaian**:
+
 Dalam kode di atas, string "lamp1", "slot1_booked", dan "slot1_booked\":true" dapat diganti dengan angka 2, 3, atau 4 sesuai slot yang Anda inginkan (misalnya, "lamp2", "slot2_booked", dll.).
 
 ### Bagian Loop
@@ -98,6 +99,7 @@ client.publish("v1/devices/me/telemetry", payload.c_str());
 ```
 
 **Penyesuaian:**
+
 Dalam payload di atas, "slot1_distance", "slot1_occupied", dan "slot1_booked" dapat diganti dengan angka 2, 3, atau 4 sesuai slot yang Anda pilih (misalnya, "slot2_distance", "slot2_occupied", dll.).
 
 ### Membuat Data Dummy
@@ -133,5 +135,6 @@ mosquitto_pub -d -q 1 -h 192.168.18.195 -p 1883 -t v1/devices/me/telemetry -i "y
 ```
 
 **Penyesuaian:**
+
 Perintah di atas akan mensimulasikan slot 4 sebagai terisi. Anda dapat mengganti angka "4" dalam "slot4_distance", "slot4_occupied", dan "slot4_booked" dengan angka lain (misalnya, 1, 2, atau 3) sesuai slot yang ingin Anda uji.
 Sesuaikan nilai distance, occupied, dan booked dalam payload sesuai kebutuhan (misalnya, "slot4_distance\":15.0" atau "slot4_occupied\":false").
