@@ -10,7 +10,8 @@
 
 **Tahap Implementasi File .ino**
 1. Pada file .ino terdapat kolom
-   `// Wi-Fi dan ThingsBoard
+
+`// Wi-Fi dan ThingsBoard
 const char* ssid = "ssid";
 const char* password = "pass";
 const char* mqtt_server = "192.168.1.19";
