@@ -37,20 +37,20 @@ File `.ino` berisi konfigurasi untuk menghubungkan perangkat ke ThingsBoard mela
 
 ```
 // Wi-Fi dan ThingsBoard
-const char* ssid = "your_wifi_ssid";        // Ganti dengan nama Wi-Fi lokal
-const char* password = "your_wifi_password"; // Ganti dengan kata sandi Wi-Fi
-const char* mqtt_server = "192.168.1.19";   // Ganti dengan IP ThingsBoard/VM
-const int mqtt_port = 1883;                 // Port default MQTT
-const char* client_id = "krs6fm4l8aie1fj8l6ll"; // Ganti dengan Client ID Anda
-const char* user_name = "cmb2tz7hjlrhw70a2cna"; // Ganti dengan Username ThingsBoard
-const char* mqtt_password = "sfm4va63axxbd3n9qzkl"; // Ganti dengan Password MQTT.
+const char* ssid = "your_wifi_ssid";        ( Ganti dengan nama Wi-Fi lokal )
+const char* password = "your_wifi_password"; ( Ganti dengan kata sandi Wi-Fi )
+const char* mqtt_server = "192.168.1.19";   ( Ganti dengan IP ThingsBoard/VM )
+const int mqtt_port = 1883;                 ( Port default MQTT )
+const char* client_id = "krs6fm4l8aie1fj8l6ll"; ( Ganti dengan Client ID Anda )
+const char* user_name = "cmb2tz7hjlrhw70a2cna"; ( Ganti dengan Username ThingsBoard )
+const char* mqtt_password = "sfm4va63axxbd3n9qzkl"; ( Ganti dengan Password MQTT. )
 ```
 
 ## Tahap Implementasi File App.py
 File `App.py` digunakan untuk mengintegrasikan aplikasi dengan ThingsBoard melalui API. Sesuaikan parameter berikut:
 ```
-THINGSBOARD_URL = "http://181.17.0.133:8080"  # Ganti dengan IP ThingsBoard Anda
-DEVICE_TOKEN = "bb05f420-1ffa-11f0-a0bc-33b4e39bb6f7"  # Ganti dengan Device Token
-USERNAME = "tenant@user.com"  # Ganti dengan email User Tenant
-PASSWORD = "Passtenant"  # Ganti dengan kata sandi User Tenant
+THINGSBOARD_URL = "http://181.17.0.133:8080"  ( Ganti dengan IP ThingsBoard Anda )
+DEVICE_TOKEN = "bb05f420-1ffa-11f0-a0bc-33b4e39bb6f7"  ( Ganti dengan Device Token )
+USERNAME = "tenant@user.com"  ( Ganti dengan email User Tenant )
+PASSWORD = "Passtenant"  ( Ganti dengan kata sandi User Tenant )
 ```
