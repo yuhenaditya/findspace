@@ -12,10 +12,17 @@
 1. Pada file .ino terdapat kolom
 
 `// Wi-Fi dan ThingsBoard`
+
 `const char* ssid = "ssid";`
+
 `const char* password = "pass";`
+
 `const char* mqtt_server = "192.168.1.19";`
+
 `const int mqtt_port = 1883;`
+
 `const char* client_id = "krs6fm4l8aie1fj8l6ll";`
+
 `const char* user_name = "cmb2tz7hjlrhw70a2cna";`
+
 `const char* mqtt_password = "sfm4va63axxbd3n9qzkl";`
