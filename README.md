@@ -111,7 +111,7 @@ mosquitto_pub -d -q 1 -h 192.168.18.195 -p 1883 -t v1/devices/me/telemetry -i "y
 ```
 
 **Penjelasan Parameter:**
-
+```
 -d: Aktifkan mode debug untuk melihat detail proses.
 
 -q 1: Tetapkan kualitas layanan (QoS) ke 1.
@@ -130,6 +130,7 @@ mosquitto_pub -d -q 1 -h 192.168.18.195 -p 1883 -t v1/devices/me/telemetry -i "y
 
 -m "{\"slot4_distance\":12.5,\"slot4_occupied\":true,\"slot4_booked\":false}": Payload data dummy dalam format JSON, menunjukkan jarak 12.5 cm, slot terisi 
 (true), dan tidak dipesan (false).
+```
 
 **Penyesuaian:**
 Perintah di atas akan mensimulasikan slot 4 sebagai terisi. Anda dapat mengganti angka "4" dalam "slot4_distance", "slot4_occupied", dan "slot4_booked" dengan angka lain (misalnya, 1, 2, atau 3) sesuai slot yang ingin Anda uji.
