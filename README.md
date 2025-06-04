@@ -113,26 +113,25 @@ mosquitto_pub -d -q 1 -h 192.168.18.195 -p 1883 -t v1/devices/me/telemetry -i "y
 ```
 
 **Penjelasan Parameter:**
-```
--d: Aktifkan mode debug untuk melihat detail proses.
 
--q 1: Tetapkan kualitas layanan (QoS) ke 1.
+- -d: Aktifkan mode debug untuk melihat detail proses.
 
--h 192.168.18.195: Host atau IP server MQTT (ganti dengan IP server Anda).
+- -q 1: Tetapkan kualitas layanan (QoS) ke 1.
 
--p 1883: Port MQTT (default adalah 1883, sesuaikan jika berbeda).
+- -h 192.168.18.195: Host atau IP server MQTT (ganti dengan IP server Anda).
 
--t v1/devices/me/telemetry: Topik untuk mengirim data telemetry ke ThingsBoard.
+- -p 1883: Port MQTT (default adalah 1883, sesuaikan jika berbeda).
 
--i "your_client_id": ID klien (ganti dengan Client ID Anda).
+- -t v1/devices/me/telemetry: Topik untuk mengirim data telemetry ke ThingsBoard.
 
--u "your_username": Nama pengguna MQTT (ganti dengan username Anda).
+- -i "your_client_id": ID klien (ganti dengan Client ID Anda).
 
--P "your_password": Kata sandi MQTT (ganti dengan password Anda).
+- -u "your_username": Nama pengguna MQTT (ganti dengan username Anda).
 
--m "{\"slot4_distance\":12.5,\"slot4_occupied\":true,\"slot4_booked\":false}": Payload data dummy dalam format JSON, menunjukkan jarak 12.5 cm, slot terisi 
+- -P "your_password": Kata sandi MQTT (ganti dengan password Anda).
+
+- -m "{\"slot4_distance\":12.5,\"slot4_occupied\":true,\"slot4_booked\":false}": Payload data dummy dalam format JSON, menunjukkan jarak 12.5 cm, slot terisi 
 (true), dan tidak dipesan (false).
-```
 
 **Penyesuaian:**
 
